@@ -1,0 +1,183 @@
+CREATE TABLE IF NOT EXISTS "name" (
+  "name_id" SERIAL NOT NULL,
+  "first_name" VARCHAR(45) NOT NULL,
+  "last_name" VARCHAR(45) NOT NULL,
+  PRIMARY KEY ("name_id")
+);
+
+
+-- -----------------------------------------------------
+-- Table `user`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS "user" (
+  user_id SERIAL NOT NULL,
+  "user_picture" VARCHAR(45) NULL,
+  "name_name_id" SERIAL NOT NULL,
+  PRIMARY KEY ("user_id"),
+CONSTRAINT fk_user_name1
+ FOREIGN KEY (name_name_id) REFERENCES "name" (name_id)
+	ON DELETE NO ACTION
+    ON UPDATE NO ACTION
+);
+-- -----------------------------------------------------
+-- Table `address`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS "address" (
+  "id_address" SERIAL NOT NULL,
+  "state" VARCHAR(45) NOT NULL,
+  "city" VARCHAR(45) NOT NULL,
+  "street" VARCHAR(45) NOT NULL,
+  "house_number" VARCHAR(20) NOT NULL,
+  "zip_code" VARCHAR(45) NULL,
+  PRIMARY KEY (id_address)
+);
+
+
+-- -----------------------------------------------------
+-- Table `user_has_adresse`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS "user_has_adresse" (
+  User_id SERIAL NOT NULL,
+  "id_address" SERIAL NOT NULL,
+  "adress_type" VARCHAR(45) NOT NULL,
+  PRIMARY KEY (User_id, id_address),
+	CONSTRAINT fk_user_has_adresse_User
+    FOREIGN KEY (User_id) REFERENCES "user" (user_id)
+	ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+	CONSTRAINT fk_user_has_adresse_address1
+    FOREIGN KEY (id_address) REFERENCES "address" (id_address)
+	ON DELETE NO ACTION
+    ON UPDATE NO ACTION
+ );
+-- -----------------------------------------------------
+-- Table `role`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS "role" (
+  "id_role" SERIAL NOT NULL,
+  "role_typ" VARCHAR(45) NOT NULL,
+  PRIMARY KEY (id_role)
+);
+
+
+-- -----------------------------------------------------
+-- Table `user_has_role`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS "user_has_role" (
+  role_id_role SERIAL NOT NULL,
+  user_User_id SERIAL NOT NULL,
+  "expiration_date" DATE NOT NULL,
+  PRIMARY KEY (role_id_role, user_User_id),
+  CONSTRAINT fk_user_has_role_role1
+    FOREIGN KEY (role_id_role) REFERENCES "role" (id_role)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT fk_user_has_role_user1
+    FOREIGN KEY (user_User_id) REFERENCES "user" (User_id)
+    );
+
+
+-- -----------------------------------------------------
+-- Table `location`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS "location" (
+  "id_location" SERIAL NOT NULL,
+  "location" VARCHAR(50) NOT NULL,
+  "id_address" SERIAL NOT NULL,
+  PRIMARY KEY (id_location),
+  CONSTRAINT fk_location_address1
+    FOREIGN KEY (id_address) REFERENCES "address" (id_address)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION);
+
+-- -----------------------------------------------------
+-- Table `contact`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS "contact" (
+  "id_contact" SERIAL NOT NULL,
+  "email" VARCHAR(45) NOT NULL,
+  "phone_number" VARCHAR(45) NOT NULL,
+  user_User_id SERIAL NOT NULL,
+  PRIMARY KEY (id_contact),
+  CONSTRAINT fk_contact_user1
+    FOREIGN KEY (user_User_id) REFERENCES "user" (User_id)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION);
+
+
+-- -----------------------------------------------------
+-- Table `discount`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS "discount" (
+  "id_discount" SERIAL NOT NULL,
+  "discount_name" VARCHAR(45) NOT NULL,
+  "date_expire" DATE NOT NULL,
+  "discount_size" VARCHAR(45) NOT NULL,
+  PRIMARY KEY (id_discount));
+
+
+-- -----------------------------------------------------
+-- Table `user_has_discount`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS "user_has_discount" (
+  "discount_id_discount" SERIAL NOT NULL,
+  user_User_id SERIAL NOT NULL,
+  PRIMARY KEY (discount_id_discount, user_User_id),
+  CONSTRAINT fk_delivery_has_discount_discount1
+    FOREIGN KEY (discount_id_discount) REFERENCES discount (id_discount)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT fk_user_has_discount_user1
+    FOREIGN KEY (user_User_id)
+    REFERENCES "user" (User_id)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION);
+
+
+-- -----------------------------------------------------
+-- Table `representer`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS "representer" (
+  "repre_id" SERIAL NOT NULL,
+  "repre_phone_number" VARCHAR(45) NOT NULL,
+  "name_name_id" SERIAL NOT NULL,
+  PRIMARY KEY (repre_id),
+  CONSTRAINT fk_representer_name1
+    FOREIGN KEY (name_name_id) REFERENCES "name" (name_id)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION);
+
+-- -----------------------------------------------------
+-- Table `delivery`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS "delivery" (
+  "id_delivery" SERIAL NOT NULL,
+  "delivery_arrive_soone" DATE NOT NULL,
+  "delivery_arrive_late" DATE NOT NULL,
+  "delivery_man_number" VARCHAR(45) NOT NULL,
+  "representer_id" SERIAL,
+  "location_id_location" SERIAL NOT NULL,
+  PRIMARY KEY (id_delivery),
+  CONSTRAINT fk_delivery_representer1
+    FOREIGN KEY (representer_id) REFERENCES representer (repre_id)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT fk_delivery_location1
+    FOREIGN KEY (location_id_location) REFERENCES "location" (id_location)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION);
+-- -----------------------------------------------------
+-- Table `user_has_delivery`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS "user_has_delivery" (
+  user_User_id SERIAL NOT NULL,
+  "delivery_id_delivery" SERIAL NOT NULL,
+  PRIMARY KEY (user_User_id,delivery_id_delivery),
+  CONSTRAINT fk_user_has_delivery_user1
+    FOREIGN KEY (user_User_id) REFERENCES "user" (User_id)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT fk_user_has_delivery_delivery1
+    FOREIGN KEY (delivery_id_delivery) REFERENCES "delivery" (id_delivery)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
